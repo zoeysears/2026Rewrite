@@ -1,0 +1,18 @@
+package frc.robot;
+
+import frc.robot.subsystems.IntakeAcutation;
+import frc.robot.subsystems.AngleController;
+import frc.robot.subsystems.BallTunnel;
+import frc.robot.subsystems.LimelightSubsystem;
+import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.IntakeRollers;
+
+public class Subsystems {
+    public static IntakeAcutation m_intakeActuation = new IntakeAcutation(19);
+    public static BallTunnel m_ballTunnel = new BallTunnel(18, 17, 23); // 17
+    public static Shooter m_shooter = new Shooter(13, 14, 15);
+    public static AngleController m_angleController = new AngleController(16);
+    public static IntakeRollers m_intakeRollers = new IntakeRollers(20); // todo need to sensor
+
+    public static final LimelightSubsystem m_limelight = new LimelightSubsystem("limelight-back");
+}

@@ -40,6 +40,8 @@ public class Constants {
     public class IntakeActuationConsts {
         // 20 -> 40
         public static final double GearRatio = 51 / 4.4444;
+        public static final double MAX_CURRENT_TOLERANCE = .5;
+        public static final double MIN_CURRENT_TOLERANCE = 0.3;
         // 14.2; // slow down
     }
 
