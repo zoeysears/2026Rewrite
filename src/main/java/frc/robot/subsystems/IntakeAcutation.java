@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import java.util.logging.LogManager;
+
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DynamicMotionMagicDutyCycle;
@@ -10,6 +12,7 @@ import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import dev.doglog.DogLog;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -45,6 +48,9 @@ public class IntakeAcutation extends SubsystemBase {
         configs.MotionMagic.MotionMagicAcceleration = 50;
         configs.MotionMagic.MotionMagicJerk = 75;
 
+        configs.CurrentLimits.StatorCurrentLimit = 120;
+        configs.CurrentLimits.StatorCurrentLimitEnable = true;
+
         configs.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
         configs.Slot0.kP = 30; // An error of 1 rotation per second results in 2V output
         configs.Slot0.kI = 1.0; // An error of 1 rotation per second increases output by 0.5V every second
@@ -68,7 +74,7 @@ public class IntakeAcutation extends SubsystemBase {
     }
 
     public Command setPositionUntilSupply(double position) {
-        return run(() -> setPosition(position)).until(() -> isStalled());
+        return run(() -> setPosition(position)).until(() -> isStalled()).finallyDo(() -> stopMotor());
     }
 
     public Command setPositionAtSpeedUntilSupply(double speed) {
@@ -107,8 +113,14 @@ public class IntakeAcutation extends SubsystemBase {
     }
 
     protected boolean isStalled() {
-        double maxStalledCurrentThersold = 20.0;
-        double maxStallVelocity = 0.5;
-        return (Math.abs(getStatorCurrent()) > maxStalledCurrentThersold) || (Math.abs(getVelocity())< maxStallVelocity);
+        double maxStalledCurrentThersold = 100.0;
+        boolean isStalled = (Math.abs(getStatorCurrent()) > maxStalledCurrentThersold);
+        DogLog.log("isStalled", isStalled);
+        DogLog.log("statorCurrent", getStatorCurrent());
+        return (Math.abs(getStatorCurrent()) > maxStalledCurrentThersold);
+    }
+
+    public void setCoastMode() {
+        actuationMotor.setNeutralMode(NeutralModeValue.Coast); //see if this will do both stop and set to coast
     }
 }

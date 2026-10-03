@@ -96,50 +96,32 @@ public class RobotContainer {
 
                 drivetrain.registerTelemetry(logger::telemeterize);
 
-                //joystick.povDown().onTrue(drivetrain.applyRequest());
+               // joystick.povDown().onTrue(drivetrain.applyRequest(Controls.localHeading())).onFalse(drivetrain.applyRequest(Controls.driveRequest()));
 
                 //INTAKE CONTROL
-                /*
+        
                 joystick.b().onTrue(m_intakeActuation.setPositionUntilSupply(1.47));
-                joystick.x().onTrue(m_intakeActuation.setPositionUntilSupply(0).andThen(new WaitCommand(1)).andThen(m_intakeRollers.stopRollerCommand()));
-                joystick.leftBumper().whileTrue(m_intakeRollers.runRollerCommand(90, 100)).whileFalse(m_intakeRollers.stopRollerCommand());
-                */
-                joystick.b().onTrue(m_intakeActuation.setPositionUntilSupply(1.47));
-                joystick.x().onTrue(m_intakeActuation.setPositionUntilSupply(0));
+                joystick.x().onTrue(m_intakeActuation.setPositionAtSpeedUntilSupply(5));
                 joystick.leftBumper().whileTrue(m_intakeRollers.runRollerCommand(90, 100)).whileFalse(m_intakeRollers.stopRollerCommand());
 
 
                 //SHOOTING
 
-        //        joystick.rightBumper().toggleOnTrue(new ShootCommand(()->0, 11, 75).alongWith(m_intakeActuation.setPositionAtSpeedUntilSupply(0.5)))
-        //                 .toggleOnFalse(m_angleController.runOnce(() -> m_angleController.setHoodAngleCommand(2)).alongWith(
-        //                                 new InstantCommand(() -> m_angleController.setPosition(0)),
-        //                                 new InstantCommand(() -> m_shooter.stopMotors()),
-        //                                 new InstantCommand(() -> m_ballTunnel.stopAllMotors()),
-        //                                 m_shooter.stopShooterCommand()));
-
-                joystick.rightBumper().toggleOnTrue(new ShootCommand(()->0, 11, 75)).toggleOnFalse(new StopShootingCommand());
+                joystick.rightBumper().whileTrue(new ShootCommand(()->0, 11, 75)).whileFalse(new StopShootingCommand());
 
 
-                // joystick.leftTrigger().whileTrue(m_ballTunnel.spiltCommand(15, 62, 14, 100)
-                // .alongWith(m_angleController.runOnce(() -> m_angleController.setHoodAngleCommand(2)))
-                // .alongWith(m_intakeRollers.runRollerCommand(85, 100))
-                // .alongWith(m_intakeActuation.setPositionAtSpeedUntilSupply(0.5)))
-                // .whileFalse(new InstantCommand(() -> m_ballTunnel.stopAllMotorsCommand()));
-
+                //BALL TUNNEL
                 joystick.leftTrigger().whileTrue(m_ballTunnel.spiltCommand(15, 62, 14, 100)
                 .alongWith(m_angleController.setHoodAngleCommand(2))
                 .alongWith(m_intakeRollers.runRollerCommand(85, 100))
                 .alongWith(m_intakeActuation.setPositionAtSpeedUntilSupply(0.5)))
-                .whileFalse(m_ballTunnel.stopAllMotorsCommand());
+                .whileFalse(m_ballTunnel.stopAllMotorsCommand().alongWith(m_intakeActuation.stopMotorCommand()).alongWith(m_intakeRollers.stopRollerCommand()).alongWith(m_angleController.setHoodAngleCommand(0)));
 
-                joystick.a().onTrue(m_ballTunnel.runBallTunnelCommand(-62.5, 100).alongWith(m_ballTunnel.runHopperCommand(-62.5, 100))).onFalse(m_ballTunnel.stopAllMotorsCommand());
-                joystick.y().onTrue(m_ballTunnel.runBallTunnelCommand(62.5, 100).alongWith( m_ballTunnel.runHopperCommand(62.5, 100))).onFalse(m_ballTunnel.stopAllMotorsCommand());
+                 joystick.a().onTrue(m_ballTunnel.runHopperAndBallTunnelCommand(-62.5, 100)).onFalse(m_ballTunnel.stopAllMotorsCommand());
+                 joystick.y().onTrue(m_ballTunnel.runHopperAndBallTunnelCommand(62.5, 100)).onFalse(m_ballTunnel.stopAllMotorsCommand());
 
-                // joystick.a().onTrue(new InstantCommand(() -> m_ballTunnel.runBallTunnelCommand(-62.5, 100)).alongWith(new InstantCommand(() -> m_ballTunnel.runHopperCommand(-62.5, 100)))).onFalse(new InstantCommand(() -> m_ballTunnel.stopAllMotorsCommand()));
-                // joystick.y().onTrue(new InstantCommand(() -> m_ballTunnel.runBallTunnelCommand(62.5, 100)).alongWith(new InstantCommand(() -> m_ballTunnel.runHopperCommand(62.5, 100)))).onFalse(new InstantCommand(() -> m_ballTunnel.stopAllMotorsCommand()));
 
                 // Reset Heading
-                joystick.start().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()).alongWith(new InstantCommand(() -> m_angleController.setHoodAngleCommand(0))));
+                 joystick.start().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()).alongWith(m_angleController.setHoodAngleCommand(0)));
         }
 }

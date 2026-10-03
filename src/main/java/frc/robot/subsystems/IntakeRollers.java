@@ -22,7 +22,7 @@ public class IntakeRollers extends SubsystemBase {
 
 
     public IntakeRollers(int motorId) {
-        rollerMotor = new TalonFX(motorId, TunerConstants.kCANBus);
+        rollerMotor = new TalonFX(motorId);
         velocityVoltage = new VelocityVoltage(0).withEnableFOC(true);
         stopMode = new  NeutralOut();
 

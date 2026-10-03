@@ -157,10 +157,10 @@ public class BallTunnel extends SubsystemBase {
     }
 
     public Command runHopperAndBallTunnelCommand(double velocity, double acceleration) {
-        return Commands.parallel(
-            run(() -> runHopper(velocity, acceleration)),
-            run(() -> runBallTunnel(velocity, acceleration))
-        );
+        return run(() -> {
+            runHopper(velocity, acceleration);
+            runBallTunnel(velocity, acceleration);
+        });
     }
 
     public Command spiltCommand(double ballTunnelVelocity, double diverterVelocity, double hopperVelocity, double acceleration) {
@@ -180,7 +180,7 @@ public class BallTunnel extends SubsystemBase {
     }
 
     public Command stopAllMotorsCommand() {
-        return new InstantCommand(() -> stopAllMotors());
+        return run(() -> stopAllMotors());
     }
 
     private void stopAllMotors() {

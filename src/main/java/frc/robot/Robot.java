@@ -8,6 +8,9 @@ import edu.wpi.first.net.WebServer;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+
+import static frc.robot.Subsystems.m_intakeActuation;
+
 import dev.doglog.DogLog;
 import dev.doglog.DogLogOptions;
 
@@ -35,6 +38,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledInit() {
+    m_intakeActuation.setCoastMode();
   }
 
   @Override
