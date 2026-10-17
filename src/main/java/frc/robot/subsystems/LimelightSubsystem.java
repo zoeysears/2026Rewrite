@@ -96,10 +96,10 @@ public class LimelightSubsystem extends SubsystemBase {
       }
     } else if (useMegaTag2 == true) {
       LimelightHelpers.SetRobotOrientation(getLimelightName(),
-          RobotContainer.drivetrain.getPigeon2().getRotation2d().getDegrees(), 0, 0, 0, 0, 0);
+          RobotContainer.drivetrain.getPigeon2().getYaw().getValueAsDouble(), 0, 0, 0, 0, 0);
       LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(getLimelightName());
 
-      if (Math.abs(RobotContainer.drivetrain.getPigeon2().getAngularVelocityZWorld().getValueAsDouble()) > 720) // if
+      if (Math.abs(RobotContainer.drivetrain.getPigeon2().getAngularVelocityZDevice().getValueAsDouble()) > 720) // if
                                                                                                                 // our
                                                                                                                 // angular
                                                                                                                 // velocity

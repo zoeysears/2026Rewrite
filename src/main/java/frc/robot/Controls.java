@@ -1,4 +1,5 @@
 package frc.robot;
+import static frc.robot.RobotContainer.drivetrain;
 import static frc.robot.Subsystems.m_limelight;
 
 import java.util.function.DoubleSupplier;
@@ -10,6 +11,7 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import frc.robot.Constants.DrivetrainConst;
 import frc.robot.Constants.FieldConst;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -46,10 +48,13 @@ public class Controls {
                                                                 * DrivetrainConst.MaxAngularRate);
         }
 
+
+
               /*
          * Turn towards given Pose2d
          */
         public static Supplier<SwerveRequest> localHeading() {
+                PIDController m_turnController = new PIDController(2.5, 0, 0.01);
                 Pose2d target;
                 if (Alliance.Red == DriverStation.getAlliance().get()) {
                         target = FieldConst.RED_HUB;
@@ -60,35 +65,53 @@ public class Controls {
                         target = FieldConst.BLUE_HUB;
                         SmartDashboard.putString("alliance", "blue");
                 }
-                        
-                final DoubleSupplier targetAngle = () -> {
-                        double dx = target.getX()
-                                        - m_limelight.getMegaTag2().pose.getX();
 
-                        double dy = target.getY()
-                                        - m_limelight.getMegaTag2().pose.getY();
 
-                        return Math.atan2(dy, dx); // radians
-                };
 
-                // Get the rotation rate -1 to 1 needed to get to target angle
-                final DoubleSupplier rotationRate = () -> {
-                        double currentHeading = m_limelight.getMegaTag2().pose.getRotation().getRadians();
-                        double error = targetAngle.getAsDouble() - currentHeading +.1;
+                Pose2d robotPose = drivetrain.getPose();
+                Pose2d visionPose = m_limelight.getMegaTag2().pose;
 
-                        // Wrap to [-pi, pi]
-                        error = Math.atan2(Math.sin(error), Math.cos(error));
+                double diffX = visionPose.getX() - robotPose.getX();
+                double diffY = visionPose.getY() - robotPose.getY();
 
-                        return error * DrivetrainConst.MaxAngularRate; // simple P controller
-                };
+                // double correctedX = robotPose.getX() + (diffX * .5);//blends 15% of vision data per loo
+                // double correctY = robotPose.getY() + (diffY * .5);
 
-                return () -> driveF
+               double visionHading = m_limelight.getMegaTag2().pose.getRotation().getRadians();
+
+
+                //calculates the target angle relative to robot position
+                double angleToTargetRad = Math.atan2(target.getY() - visionPose.getY(), target.getX() - visionPose.getX());
+                double rotationRate = m_turnController.calculate(visionHading, angleToTargetRad);
+        
+
+                            return () -> driveF
                                 .withVelocityX(-(isRightStickDrive ? joystick.getRightY() : joystick.getLeftY())
                                                 * DrivetrainConst.MaxSpeed)
                                 .withVelocityY(
                                                 -(isRightStickDrive ? joystick.getRightX() : joystick.getLeftX())
                                                                 * DrivetrainConst.MaxSpeed)
-                                .withRotationalRate(rotationRate.getAsDouble());
+                                .withRotationalRate(rotationRate);
+                // final DoubleSupplier targetAngle = () -> {
+                //         double dx = target.getX()
+                //                         - m_limelight.getMegaTag2().pose.getX();
+
+                //         double dy = target.getY()
+                //                         - m_limelight.getMegaTag2().pose.getY();
+
+                //         return Math.atan2(dy, dx); // radians
+                // };
+
+                // // Get the rotation rate -1 to 1 needed to get to target angle
+                // final DoubleSupplier rotationRate = () -> {
+                //         double currentHeading = m_limelight.getMegaTag2().pose.getRotation().getRadians();
+                //         double error = targetAngle.getAsDouble() - currentHeading +.1;
+
+                //         // Wrap to [-pi, pi]
+                //         error = Math.atan2(Math.sin(error), Math.cos(error));
+
+                //         return error * DrivetrainConst.MaxAngularRate; // simple P controller
+                // };
         }
 
         /*
