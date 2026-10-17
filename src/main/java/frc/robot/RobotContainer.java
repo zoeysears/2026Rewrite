@@ -96,7 +96,7 @@ public class RobotContainer {
 
                 drivetrain.registerTelemetry(logger::telemeterize);
 
-               // joystick.povDown().onTrue(drivetrain.applyRequest(Controls.localHeading())).onFalse(drivetrain.applyRequest(Controls.driveRequest()));
+               joystick.povDown().onTrue(drivetrain.applyRequest(Controls.localHeading())).onFalse(drivetrain.applyRequest(Controls.driveRequest()));
 
                 //INTAKE CONTROL
         
@@ -122,6 +122,6 @@ public class RobotContainer {
 
 
                 // Reset Heading
-                 joystick.start().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()).alongWith(m_angleController.setHoodAngleCommand(0)));
+                 joystick.start().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
         }
 }

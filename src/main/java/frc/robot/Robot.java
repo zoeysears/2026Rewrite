@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 import static frc.robot.Subsystems.m_intakeActuation;
+import static frc.robot.Subsystems.m_limelight;
 
 import dev.doglog.DogLog;
 import dev.doglog.DogLogOptions;
@@ -33,6 +34,7 @@ public class Robot extends TimedRobot {
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
     m_robotContainer.robotPeriodic();
+    m_limelight.updateOdometry();
     
   }
 

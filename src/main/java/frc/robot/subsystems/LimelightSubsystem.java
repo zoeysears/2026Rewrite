@@ -1,10 +1,6 @@
 package frc.robot.subsystems;
 
-import com.ctre.phoenix6.hardware.Pigeon2;
-
 import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.kinematics.SwerveModulePosition;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.VisionConsts;
@@ -12,9 +8,7 @@ import frc.robot.LimelightHelpers;
 import frc.robot.RobotContainer;
 import frc.robot.Constants.DrivetrainConst;
 
-
 public class LimelightSubsystem extends SubsystemBase {
-  public LimelightHelpers helper = new LimelightHelpers();
   private final String limeLightName;
 
   /** Creates a new LimelightSubsystem. */
@@ -24,6 +18,7 @@ public class LimelightSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+
   }
 
   public double limelight_aim_proportional() {
@@ -63,7 +58,7 @@ public class LimelightSubsystem extends SubsystemBase {
     return -1;
   }
 
-   public LimelightHelpers.PoseEstimate getMegaTag2() {
+  public LimelightHelpers.PoseEstimate getMegaTag2() {
     return LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limeLightName);
   }
 
@@ -73,6 +68,65 @@ public class LimelightSubsystem extends SubsystemBase {
 
   public String getLimelightName() {
     return limeLightName;
+  }
+
+  public void updateOdometry() {
+    boolean useMegaTag2 = true; // set to false to use MegaTag1
+    boolean doRejectUpdate = false;
+    if (useMegaTag2 == false) {
+      LimelightHelpers.PoseEstimate mt1 = LimelightHelpers.getBotPoseEstimate_wpiBlue(getLimelightName());
+
+      if (mt1.tagCount == 1 && mt1.rawFiducials.length == 1) {
+        if (mt1.rawFiducials[0].ambiguity > .7) {
+          doRejectUpdate = true;
+        }
+        if (mt1.rawFiducials[0].distToCamera > 3) {
+          doRejectUpdate = true;
+        }
+      }
+      if (mt1.tagCount == 0) {
+        doRejectUpdate = true;
+      }
+
+      if (!doRejectUpdate) {
+        RobotContainer.drivetrain.setVisionMeasurementStdDevs(VecBuilder.fill(.5, .5, 9999999));
+        RobotContainer.drivetrain.addVisionMeasurement(
+            mt1.pose,
+            mt1.timestampSeconds);
+      }
+    } else if (useMegaTag2 == true) {
+      LimelightHelpers.SetRobotOrientation(getLimelightName(),
+          RobotContainer.drivetrain.getPigeon2().getRotation2d().getDegrees(), 0, 0, 0, 0, 0);
+      LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(getLimelightName());
+
+      if (Math.abs(RobotContainer.drivetrain.getPigeon2().getAngularVelocityZWorld().getValueAsDouble()) > 720) // if
+                                                                                                                // our
+                                                                                                                // angular
+                                                                                                                // velocity
+                                                                                                                // is
+                                                                                                                // greater
+      // than 720 degrees per second, ignore
+      // vision updates
+      {
+        doRejectUpdate = true;
+      }
+      if (mt2.tagCount == 0) {
+        doRejectUpdate = true;
+      }
+      if (!doRejectUpdate) {
+        RobotContainer.drivetrain.setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999)); // technically just
+                                                                                                 // need to set it once
+                                                                                                 // if you trust it; can
+                                                                                                 // change the dynamic
+                                                                                                 // (n1, n2) for
+                                                                                                 // confidence, like how
+                                                                                                 // far they are, which
+                                                                                                 // ones, etc
+        RobotContainer.drivetrain.addVisionMeasurement(
+            mt2.pose,
+            mt2.timestampSeconds); // can you feed the std devs
+      }
+    }
   }
 
 }
