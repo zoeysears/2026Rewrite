@@ -269,4 +269,15 @@ public static Supplier<SwerveRequest> localHeading() {
                                 .withVelocityY(-ySpeed.getAsDouble())
                                 .withRotationalRate(0);
         }
+
+        public static boolean isAimedAtHub(double maxErrorDeg) {
+    Pose2d pose = drivetrain.getState().Pose;
+    Pose2d hub = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red
+            ? FieldConst.RED_HUB
+            : FieldConst.BLUE_HUB;
+
+    double desired = Math.atan2(hub.getY() - pose.getY(), hub.getX() - pose.getX());
+    double error = MathUtil.angleModulus(desired - pose.getRotation().getRadians());
+    return Math.abs(error) < Math.toRadians(maxErrorDeg);
+}
 }

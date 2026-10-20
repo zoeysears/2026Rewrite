@@ -81,7 +81,7 @@ public class Constants {
         public static final double LIMELIGHT_ANGLE = 0;
         // angle of camera from looking straight, NOT ON ROBOT
 
-        public static final String LIMELIGHT_NAME = "limelight";
+        public static final String LIMELIGHT_NAME = "limelight-back";
     }
 
     public class FieldConst {

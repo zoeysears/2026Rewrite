@@ -16,6 +16,7 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -24,6 +25,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.ShooterConsts;
+import frc.robot.RobotContainer;
 import frc.robot.generated.TunerConstants;
 import frc.robot.util.interpolable.InterpolatingDouble;
 
@@ -134,10 +136,19 @@ public class Shooter extends SubsystemBase {
    * @param acceleration in rotations per second squared
    * @return a command that will run the intake motor
    */
+  // public Command runShooterCommand(double acceleration) {
+  //   Pose2d pose = RobotContainer.drivetrain.getState().Pose;
+  //   double velocity = calcSpeedV2(pose.getX(), pose.getY()).getAsDouble();
+  //   return run(() -> runShooter(velocity, acceleration));
+  // }
+
   public Command runShooterCommand(double acceleration) {
-    double velocity = calcSpeedV2(xPose, yPose).getAsDouble();
-    return run(() -> runShooter(velocity, acceleration));
-  }
+    return run(() -> {
+        Pose2d pose = RobotContainer.drivetrain.getState().Pose;
+        double velocity = calcSpeedV2(pose.getX(), pose.getY()).getAsDouble();
+        runShooter(velocity, acceleration);
+    });
+}
 
   /**
    * Run the intake motor at a given velocity and acceleration
@@ -189,36 +200,52 @@ public class Shooter extends SubsystemBase {
     return Math.sqrt(loss * top / bottom);
   }
 
-  public DoubleSupplier calcSpeedV2(double x, double y) {
-    double curentXDistance = 0;
-    double curentYDistance = 0;
+//   public DoubleSupplier calcSpeedV2(double x, double y) {
+//     double curentXDistance = 0;
+//     double curentYDistance = 0;
 
-    if (DriverStation.getAlliance().get() == Alliance.Red) {
-    curentXDistance = Math.pow(Constants.FieldConst.RED_HUB.getX() - x, 2);
-    curentYDistance = Math.pow(Constants.FieldConst.RED_HUB.getY() - y, 2);
-    } else {
-      curentXDistance = Math.pow(Constants.FieldConst.BLUE_HUB.getX() - x, 2);
-      curentYDistance = Math.pow(Constants.FieldConst.BLUE_HUB.getY() - y, 2);
-    }
+//     if (DriverStation.getAlliance().get() == Alliance.Red) {
+//     curentXDistance = Math.pow(Constants.FieldConst.RED_HUB.getX() - x, 2);
+//     curentYDistance = Math.pow(Constants.FieldConst.RED_HUB.getY() - y, 2);
+//     } else {
+//       curentXDistance = Math.pow(Constants.FieldConst.BLUE_HUB.getX() - x, 2);
+//       curentYDistance = Math.pow(Constants.FieldConst.BLUE_HUB.getY() - y, 2);
+//     }
 
- double limelightX = m_limelight.getMegaTag2().pose.getX();
- double limelightY = m_limelight.getMegaTag2().pose.getY();
- double limelightXDistance = Math.pow(Constants.FieldConst.BLUE_HUB.getX() - limelightX, 2);
- double limelightYDistance = Math.pow(Constants.FieldConst.BLUE_HUB.getY() - limelightY, 2);
- double limelightDistance = Math.sqrt(limelightYDistance + limelightXDistance);
- SmartDashboard.putNumber(("limelightDistance"), limelightDistance);
+//  double limelightX = m_limelight.getMegaTag2().pose.getX();
+//  double limelightY = m_limelight.getMegaTag2().pose.getY();
+//  double limelightXDistance = Math.pow(Constants.FieldConst.BLUE_HUB.getX() - limelightX, 2);
+//  double limelightYDistance = Math.pow(Constants.FieldConst.BLUE_HUB.getY() - limelightY, 2);
+//  double limelightDistance = Math.sqrt(limelightYDistance + limelightXDistance);
+//  SmartDashboard.putNumber(("limelightDistance"), limelightDistance);
 
-    double distance = Math.sqrt(curentYDistance + curentXDistance);
+//     double distance = Math.sqrt(curentYDistance + curentXDistance);
+//     double speed = Constants.ShootingConst.DISTANCE_TO_SHOOT_SPEED
+//         .getInterpolated(new InterpolatingDouble(Units.metersToInches(distance))).value;
+//     SmartDashboard.putNumber("CalcSpeed.spd", speed);
+//     SmartDashboard.putNumber("CalcSpeed.dist",Units.metersToInches(distance));
+//     SmartDashboard.putNumber("CalcSpeed.XDist", curentXDistance);
+//     SmartDashboard.putNumber("CalcSpeed.YDist", curentYDistance);
+//     SmartDashboard.putNumber("getXPose", x);
+//     SmartDashboard.putNumber("getYPose", y);
+//     return () -> speed;
+//  }
+
+public DoubleSupplier calcSpeedV2(double x, double y) {
+    Pose2d hub = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red
+            ? Constants.FieldConst.RED_HUB
+            : Constants.FieldConst.BLUE_HUB;
+
+    double distanceMeters = Math.hypot(hub.getX() - x, hub.getY() - y);
+    double distanceInches = Units.metersToInches(distanceMeters);
+
     double speed = Constants.ShootingConst.DISTANCE_TO_SHOOT_SPEED
-        .getInterpolated(new InterpolatingDouble(Units.metersToInches(distance))).value;
+            .getInterpolated(new InterpolatingDouble(distanceInches)).value;
+
+    SmartDashboard.putNumber("CalcSpeed.dist_in", distanceInches);
     SmartDashboard.putNumber("CalcSpeed.spd", speed);
-    SmartDashboard.putNumber("CalcSpeed.dist",Units.metersToInches(distance));
-    SmartDashboard.putNumber("CalcSpeed.XDist", curentXDistance);
-    SmartDashboard.putNumber("CalcSpeed.YDist", curentYDistance);
-    SmartDashboard.putNumber("getXPose", x);
-    SmartDashboard.putNumber("getYPose", y);
     return () -> speed;
-  }
+}
 
   @Override
   public void periodic() {

@@ -69,10 +69,6 @@ public class RobotContainer {
 
         public static Field2d m_field = new Field2d();
 
-        public static double xPose;
-
-        public static double yPose;
-
         public static final PowerDistribution m_pdh = new PowerDistribution(30, ModuleType.kRev);
 
         public RobotContainer() {
