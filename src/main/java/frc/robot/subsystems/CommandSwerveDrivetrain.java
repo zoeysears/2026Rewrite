@@ -29,11 +29,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
-import static frc.robot.RobotContainer.backLeft;
-import static frc.robot.RobotContainer.frontLeft;
-import static frc.robot.RobotContainer.backRight;
-import static frc.robot.RobotContainer.drivetrain;
-import static frc.robot.RobotContainer.frontRight;
 
 /**
  * Class that extends the Phoenix 6 SwerveDrivetrain class and implements
@@ -399,7 +394,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     public void setPose(Pose2d pose) {
         System.out.println("Setting pose to X: " + pose.getX() + ", Y: " + pose.getY() + ", Rot: " + pose.getRotation().getDegrees());
-        // getState().Pose = pose;
     }
 
     public Pose2d getPose(){

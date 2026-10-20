@@ -1,7 +1,5 @@
 package frc.robot.subsystems;
 
-import java.util.logging.LogManager;
-
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DynamicMotionMagicDutyCycle;
@@ -23,13 +21,11 @@ public class IntakeAcutation extends SubsystemBase {
 
     private TalonFX actuationMotor;
     private MotionMagicVoltage motionMagicVoltage;
-    private NeutralOut stopMode;
 
     public IntakeAcutation(int motorId) {
         actuationMotor = new TalonFX(motorId, TunerConstants.kCANBus);
 
         motionMagicVoltage = new MotionMagicVoltage(0).withEnableFOC(true);
-        stopMode = new NeutralOut();
         setMotorConfigs();
 
     }
@@ -95,7 +91,6 @@ public class IntakeAcutation extends SubsystemBase {
     }
 
     private void stopMotor() {
-        //actuationMotor.setControl(stopMode);
         actuationMotor.stopMotor();
         actuationMotor.setNeutralMode(NeutralModeValue.Coast); //see if this will do both stop and set to coast
     }

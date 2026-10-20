@@ -200,11 +200,6 @@ public class Shooter extends SubsystemBase {
       curentXDistance = Math.pow(Constants.FieldConst.BLUE_HUB.getX() - x, 2);
       curentYDistance = Math.pow(Constants.FieldConst.BLUE_HUB.getY() - y, 2);
     }
-    // curentXDistance = Math.pow(Constants.FieldConst.BLUE_HUB.getX() -
-    // m_limelight.getMegaTag2().pose.getX(), 2);
-    // curentYDistance = Math.pow(Constants.FieldConst.BLUE_HUB.getY() -
-    // m_limelight.getMegaTag2().pose.getY(), 2);
-    // }
 
  double limelightX = m_limelight.getMegaTag2().pose.getX();
  double limelightY = m_limelight.getMegaTag2().pose.getY();
@@ -227,13 +222,7 @@ public class Shooter extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // double curentXDistance = Math.pow(Constants.FieldConst.RED_HUB.getX() - RobotContainer.drivetrain.getPose().getX(), 2);
-    // System.out.println("distance Meters X: " + curentXDistance);
-    // double curentYDistance = Math.pow(Constants.FieldConst.RED_HUB.getY() - RobotContainer.drivetrain.getPose().getX(), 2);
-    // System.out.println("distance Meters Y: " + curentYDistance);
-    // System.out.println("distance Meters: " + Math.sqrt(curentYDistance + curentXDistance));
-    // // System.out.println("distance Inches: " + Units.metersToInches(distance));
-    // System.out.println("Shooter speed: " + leftShooterMotor.getVelocity());
+
   }
 
 }
