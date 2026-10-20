@@ -96,8 +96,7 @@ public class RobotContainer {
 
                 drivetrain.registerTelemetry(logger::telemeterize);
 
-               joystick.povDown().onTrue(drivetrain.applyRequest(Controls.localHeading())).onFalse(drivetrain.applyRequest(Controls.driveRequest()));
-
+                joystick.povDown().whileTrue(drivetrain.applyRequest(Controls.localHeading()));
                 //INTAKE CONTROL
         
                 joystick.b().onTrue(m_intakeActuation.setPositionUntilSupply(1.47));
